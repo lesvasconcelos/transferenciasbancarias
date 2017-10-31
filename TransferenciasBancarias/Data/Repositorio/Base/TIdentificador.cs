@@ -6,7 +6,7 @@ using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson;
 using TransferenciasBancarias.Lib.Validacao;
 
-namespace TransferenciasBancarias.Data.Repositorio.Base
+namespace TransferenciasBancarias.Data.Repositorio
 {
     public class TIdentificador : Validacao
     {

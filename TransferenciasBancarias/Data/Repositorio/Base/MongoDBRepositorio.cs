@@ -6,8 +6,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using TransferenciasBancarias.Lib;
 using TransferenciasBancarias.Lib.Configuracao;
+using TransferenciasBancarias.Lib.Exceptions;
 
-namespace TransferenciasBancarias.Data.Repositorio.Base
+namespace TransferenciasBancarias.Data.Repositorio
 {
     public class MongoDBRepositorio<TEntity> : IRepositorio<TEntity> where TEntity : TIdentificador
     {
@@ -19,24 +20,49 @@ namespace TransferenciasBancarias.Data.Repositorio.Base
             database = client.GetDatabase(Configuracoes.MongoDbDatabase);
         }
 
-        public void Create(TEntity entity)
+        public string Create(TEntity entity)
         {
             var validacao = entity.Valida();
 
-            if (validacao.Valido)
+            if (!validacao.Valido)
+            {
+                throw new ValidationException(validacao.Erros);
+            }
+
+            try
             {
                 GetCollection().InsertOne(entity);
+
+                return entity.Id.ToString();
+            }
+            catch(Exception e)
+            {
+                throw new MongoDbException(e);
             }
         }
 
         public void Delete(TEntity entity)
         {
-            GetCollection().DeleteOneAsync(x => x.Id.Equals(entity.Id));
+            try
+            {
+                GetCollection().DeleteOneAsync(x => x.Id.Equals(entity.Id));
+            }
+            catch (Exception e)
+            {
+                throw new MongoDbException(e);
+            }
         }
         
         public TEntity Get(string id)
         {
-            return GetCollection().Find(x => x.Id == new ObjectId(id)).First();
+            try
+            {
+                return GetCollection().Find(x => x.Id == new ObjectId(id)).First();
+            }
+            catch (Exception e)
+            {
+                throw new MongoDbException(e);
+            }
         }
 
         protected IMongoCollection<TEntity> GetCollection()
@@ -46,16 +72,34 @@ namespace TransferenciasBancarias.Data.Repositorio.Base
 
         public IEnumerable<TEntity> List()
         {
-            return GetCollection().AsQueryable().ToList();
+            try
+            {
+                return GetCollection().AsQueryable().ToList();
+            }
+            catch (Exception e)
+            {
+                throw new MongoDbException(e);
+            }
         }
                 
-        public void Update(string id, TEntity entity)
+        public TEntity Update(string id, TEntity entity)
         {
             var validacao = entity.Valida();
 
-            if (validacao.Valido)
+            if (!validacao.Valido)
+            {
+                throw new ValidationException(validacao.Erros);
+            }
+
+            try
             {
                 GetCollection().ReplaceOne(x => x.Id == new ObjectId(id), entity);
+
+                return entity;
+            }
+            catch (Exception e)
+            {
+                throw new MongoDbException(e);
             }
         }
 

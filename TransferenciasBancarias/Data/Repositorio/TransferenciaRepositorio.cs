@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TransferenciasBancarias.Data.Model;
-using TransferenciasBancarias.Data.Repositorio.Base;
 using TransferenciasBancarias.Lib.Paginacao;
 
 namespace TransferenciasBancarias.Data.Repositorio
@@ -27,7 +26,7 @@ namespace TransferenciasBancarias.Data.Repositorio
 
         public TransferenciaRepositorio() : base() { }
 
-        public new void Create(Transferencia entity)
+        public new string Create(Transferencia entity)
         {
             entity.Removido = false;
             entity.Data = DateTime.UtcNow;
@@ -54,7 +53,7 @@ namespace TransferenciasBancarias.Data.Repositorio
                 entity.Status = Transferencia.Statuses.OK;
             }
 
-            base.Create(entity);
+            return base.Create(entity);
         }
 
         public void Delete(string id)

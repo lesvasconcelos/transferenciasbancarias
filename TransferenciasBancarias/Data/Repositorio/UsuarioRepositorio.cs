@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TransferenciasBancarias.Data.DTO;
 using TransferenciasBancarias.Data.Model;
-using TransferenciasBancarias.Data.Repositorio.Base;
+using TransferenciasBancarias.Data.Repositorio;
 
 namespace TransferenciasBancarias.Data.Repositorio
 {

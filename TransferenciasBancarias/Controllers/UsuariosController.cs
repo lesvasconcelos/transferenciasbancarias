@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using TransferenciasBancarias.Data.DTO;
 using TransferenciasBancarias.Data.Repositorio;
+using TransferenciasBancarias.Lib.Exceptions;
+using TransferenciasBancarias.Lib.Extensions;
 
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -17,56 +19,119 @@ namespace TransferenciasBancarias.Controllers
 
         // GET: api/usuarios
         [HttpGet]
-        public IEnumerable<UsuarioDTO> Get()
+        public IActionResult Get()
         {
-            var repositorio = UsuarioRepositorio.Instance;
-            return repositorio.GetAll();            
+            try
+            {
+                return Ok(UsuarioRepositorio.GetAll());
+            }
+            catch (ClientException e)
+            {
+                return HttpBadRequest(e);
+            }
+            catch (ServerException e)
+            {
+                return this.HttpInternalServerError(e);
+            }
         }
 
         // GET api/usuarios/5
         [HttpGet("{id}")]
-        public UsuarioDTO Get(string id)
+        public IActionResult Get(string id)
         {
-            var entity = UsuarioRepositorio.Get(id);
-
-            return new UsuarioDTO
+            try
             {
-                Id = entity.Id.ToString(),
-                Cnpj = entity.Cnpj,
-                Nome = entity.Nome
-            };
+                var entity = UsuarioRepositorio.Get(id);
+
+                var result = new UsuarioDTO
+                {
+                    Id = entity.Id.ToString(),
+                    Cnpj = entity.Cnpj,
+                    Nome = entity.Nome
+                };
+
+                return Ok(result);
+            }
+            catch (ClientException e)
+            {
+                return HttpBadRequest(e);
+            }
+            catch (ServerException e)
+            {
+                return this.HttpInternalServerError(e);
+            }
         }
 
         // POST api/usuarios
         [HttpPost]
-        public void Post([FromBody]UsuarioDTO model)
+        public IActionResult Post([FromBody]UsuarioDTO model)
         {
-            UsuarioRepositorio.Create(new Data.Model.Usuario
+            try
             {
-                Cnpj = model.Cnpj,
-                Nome = model.Nome
-            });
+                var id = UsuarioRepositorio.Create(new Data.Model.Usuario
+                {
+                    Cnpj = model.Cnpj,
+                    Nome = model.Nome
+                });
+
+                return Created(Url.Action("get","usuarios"), new { id = id });
+            }
+            catch (ClientException e)
+            {
+                return HttpBadRequest(e.Message);
+            }
+            catch (ServerException e)
+            {
+                return this.HttpInternalServerError(e);
+            }
         }
 
         // PUT api/usuarios/5
         [HttpPut("{id}")]
-        public void Put(string id, [FromBody]UsuarioDTO model)
+        public IActionResult Put(string id, [FromBody]UsuarioDTO model)
         {
-            var entity = UsuarioRepositorio.Get(id);
+            try
+            {
+                var entity = UsuarioRepositorio.Get(id);
 
-            entity.Nome = model.Nome;
-            entity.Cnpj = model.Cnpj;
+                entity.Nome = model.Nome;
+                entity.Cnpj = model.Cnpj;
 
-            UsuarioRepositorio.Update(id, entity);
+                UsuarioRepositorio.Update(id, entity);
+
+                return Ok();
+            }
+            catch (ClientException e)
+            {
+                return HttpBadRequest(e);
+            }
+            catch (ServerException e)
+            {
+                return this.HttpInternalServerError(e);
+            }
 
         }
 
         // DELETE api/usuarios/5
         [HttpDelete("{id}")]
-        public void Delete(string id)
+        public IActionResult Delete(string id)
         {
-            var entity = UsuarioRepositorio.Get(id);
-            UsuarioRepositorio.Delete(entity);
+            try
+            {
+                var entity = UsuarioRepositorio.Get(id);
+
+                UsuarioRepositorio.Delete(entity);
+
+                return Ok();
+            }
+            catch (ClientException e)
+            {
+                return HttpBadRequest(e);
+            }
+            catch (ServerException e)
+            {
+                return this.HttpInternalServerError(e);
+            }
         }
     }
 }
