@@ -27,7 +27,7 @@ namespace TransferenciasBancarias.Controllers
             }
             catch (ClientException e)
             {
-                return HttpBadRequest(e);
+                return HttpBadRequest(new { e.Message });
             }
             catch (ServerException e)
             {
@@ -54,7 +54,7 @@ namespace TransferenciasBancarias.Controllers
             }
             catch (ClientException e)
             {
-                return HttpBadRequest(e);
+                return HttpBadRequest(new { e.Message });
             }
             catch (ServerException e)
             {
@@ -78,7 +78,7 @@ namespace TransferenciasBancarias.Controllers
             }
             catch (ClientException e)
             {
-                return HttpBadRequest(e.Message);
+                return HttpBadRequest(new { e.Message });
             }
             catch (ServerException e)
             {
@@ -99,11 +99,11 @@ namespace TransferenciasBancarias.Controllers
 
                 UsuarioRepositorio.Update(id, entity);
 
-                return Ok();
+                return Ok(entity);
             }
             catch (ClientException e)
             {
-                return HttpBadRequest(e);
+                return HttpBadRequest(new { e.Message });
             }
             catch (ServerException e)
             {
@@ -126,7 +126,7 @@ namespace TransferenciasBancarias.Controllers
             }
             catch (ClientException e)
             {
-                return HttpBadRequest(e);
+                return HttpBadRequest(new { e.Message });
             }
             catch (ServerException e)
             {

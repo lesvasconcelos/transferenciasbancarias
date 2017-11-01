@@ -49,7 +49,6 @@ namespace TransferenciasBancarias.Data.Model
         public DateTime Data { get; set; }
 
         [Required(AllowEmptyStrings = false, ErrorMessage = "O campo Valor é obrigatório.")]
-        [RegularExpression(@"^\d+\.\d{0,2}$")]
         [Range(0, 999999999999999.99, ErrorMessage = "O campo Valor precisa ser um número válido.")]
         public decimal Valor { get; set; }
 

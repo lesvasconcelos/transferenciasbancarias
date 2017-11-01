@@ -8,7 +8,7 @@ namespace TransferenciasBancarias.Lib.Extensions
     {
         public static IActionResult HttpInternalServerError(this Controller controller, ServerException exception)
         {
-            var result =  controller.Json(exception.Message);
+            var result =  controller.Json(new { exception.Message });
 
             result.StatusCode = (int)HttpStatusCode.InternalServerError;
 

@@ -4,6 +4,7 @@ using TransferenciasBancarias.Data.DTO;
 using TransferenciasBancarias.Data.Repositorio;
 using TransferenciasBancarias.Lib.Exceptions;
 using TransferenciasBancarias.Lib.Extensions;
+using System;
 
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -17,12 +18,12 @@ namespace TransferenciasBancarias.Controllers
 
         // GET: api/transferencias
         [HttpGet]
-        public IActionResult Get(int page = 1, int pageSize = 50)
+        public IActionResult Get(DateTime? dataInicial, DateTime? dataFinal, string nomePagador, string nomeBeneficiario, int page = 1, int pageSize = 50)
         {
             try
             {
                 var dto = new ListaTransferenciaDTO();
-                var lista = TransferenciaRepositorio.List(page: page, pageSize: pageSize);
+                var lista = TransferenciaRepositorio.List(dataInicial, dataFinal, nomePagador, nomeBeneficiario, page, pageSize);
 
                 dto.Dados = lista.Dados.Select(s => new TransferenciaDTO
                 {
@@ -51,57 +52,13 @@ namespace TransferenciasBancarias.Controllers
             }
             catch(ClientException e)
             {
-                return HttpBadRequest(e);
+                return HttpBadRequest(new { e.Message });
             }
             catch(ServerException e)
             {
                 return this.HttpInternalServerError(e);
             }
-        }
-
-        // POST: api/transferencias
-        [HttpPost]
-        [Route("[action]")]
-        public IActionResult Filter(int page, int pageSize, [FromBody]FiltroTransferenciaDTO filtro)
-        {
-            try
-            {
-                var result = new ListaTransferenciaDTO();
-                var lista = TransferenciaRepositorio.List(filtro.DataInicial, filtro.DataFinal, filtro.NomePagador, filtro.NomeBeneficiario, page, pageSize);
-
-                result.TotalDeRegistros = lista.TotalDeRegistros;
-                result.Dados = lista.Dados.Select(s => new TransferenciaDTO
-                {
-                    AgenciaBeneficiario = s.AgenciaBeneficiario,
-                    AgenciaPagador = s.AgenciaPagador,
-                    BancoBeneficiario = s.BancoBeneficiario,
-                    BancoPagador = s.BancoPagador,
-                    ContaBeneficiario = s.ContaBeneficiario,
-                    ContaPagador = s.ContaPagador,
-                    Data = s.Data,
-                    Id = s.Id.ToString(),
-                    IdUsuario = s.IdUsuario.ToString(),
-                    NomeBeneficiario = s.NomeBeneficiario,
-                    NomePagador = s.NomePagador,
-                    Status = s.Status,
-                    Tipo = s.Tipo,
-                    Valor = s.Valor
-                });
-                result.SomatorioValor = lista.Dados.Sum(s => s.Valor);
-                result.Pagina = lista.PaginaAtual;
-                result.TamanhoDaPagina = lista.TamanhoDaPagina;
-
-                return Ok(result);
-            }
-            catch (ClientException e)
-            {
-                return HttpBadRequest(e);
-            }
-            catch (ServerException e)
-            {
-                return this.HttpInternalServerError(e);
-            }
-        }
+        }        
 
         // GET api/transferencias/5
         [HttpGet("{id}")]
@@ -117,6 +74,7 @@ namespace TransferenciasBancarias.Controllers
                     AgenciaPagador = entity.AgenciaPagador,
                     BancoBeneficiario = entity.BancoBeneficiario,
                     BancoPagador = entity.BancoPagador,
+                    Data = entity.Data,
                     ContaBeneficiario = entity.ContaBeneficiario,
                     ContaPagador = entity.ContaPagador,
                     Id = entity.Id.ToString(),
@@ -132,7 +90,7 @@ namespace TransferenciasBancarias.Controllers
             }
             catch (ClientException e)
             {
-                return HttpBadRequest(e);
+                return HttpBadRequest(new { e.Message });
             }
             catch (ServerException e)
             {
@@ -166,7 +124,7 @@ namespace TransferenciasBancarias.Controllers
             }
             catch (ClientException e)
             {
-                return HttpBadRequest(e);
+                return HttpBadRequest(new { e.Message });
             }
             catch (ServerException e)
             {
@@ -188,7 +146,7 @@ namespace TransferenciasBancarias.Controllers
             }
             catch (ClientException e)
             {
-                return HttpBadRequest(e);
+                return HttpBadRequest(new { e.Message });
             }
             catch (ServerException e)
             {
